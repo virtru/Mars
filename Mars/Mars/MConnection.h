@@ -10,7 +10,11 @@
 
 #import <sqlite3.h>
 
+#ifdef DEBUG
+#define LOG_SQL 1
+#else
 #define LOG_SQL 0
+#endif
 
 #define kNoPk -1
 
