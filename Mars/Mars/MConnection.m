@@ -153,9 +153,7 @@ void myTraceFunc(void *uData, const char *statement)
 			[results addObject:columns];
 		} else {
 			CTLog(@"Error %li calling sqlite3_step exec_query %@", r, self.lastError);
-#ifdef DEBUG
             sqlite3_trace(self.dbHandle, myTraceFunc, NULL);
-#endif
 			if (error) {
 				*error = self.lastError;
 			}
