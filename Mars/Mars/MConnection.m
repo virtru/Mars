@@ -11,7 +11,7 @@
 #import "MQuery+Private.h"
 #import "MSelectQuery.h"
 
-static NSMutableArray* sQueryList;
+static NSMutableArray* sQueryList = nil;
 
 void myTraceFunc(void *uData, const char *statement)
 {
