@@ -44,7 +44,6 @@ void myTraceFunc(void *uData, const char *statement)
     
     [self configureDatabaseSettings];
     
-    self.sQueryList = [NSMutableArray arrayWithCapacity:4];
     return YES;
 }
 
@@ -74,10 +73,6 @@ void myTraceFunc(void *uData, const char *statement)
 #if LOG_SQL
     NSLog(@"%@", query.sql);
 #endif
-    if (self.sQueryList.count > 3) {
-        [self.sQueryList removeObjectAtIndex:0];
-    }
-    [self.sQueryList addObject:query.sql];
     
     sqlite3_stmt *stmt = [self createStatement:query.sql bindings:query.bindings error:error];
     if (!stmt) {
@@ -95,11 +90,6 @@ void myTraceFunc(void *uData, const char *statement)
 #if LOG_SQL
     NSLog(@"%@", query.sql);
 #endif
-    
-    if (self.sQueryList.count > 3) {
-        [self.sQueryList removeObjectAtIndex:0];
-    }
-    [self.sQueryList addObject:query.sql];
     
     sqlite3_stmt *stmt = [self createStatement:query.sql bindings:query.bindings error:error];
     if (!stmt) {
@@ -165,9 +155,9 @@ void myTraceFunc(void *uData, const char *statement)
             }
             [results addObject:columns];
         } else {
-            CTLog(@"Error %li calling sqlite3_step exec_query %@, last statments:%@",
-                  r, self.lastError, self.sQueryList);
-            //sqlite3_trace(self.dbHandle, myTraceFunc, NULL);
+            CTLog(@"Error %li calling sqlite3_step exec_query %@",
+                  r, self.lastError);
+            sqlite3_trace(self.dbHandle, myTraceFunc, NULL);
             if (error) {
                 *error = self.lastError;
             }
@@ -198,9 +188,9 @@ void myTraceFunc(void *uData, const char *statement)
     } else if (rc == SQLITE_ROW) {
         NSAssert(NO, @"A executeUpdate is being called with a query string");
     } else {
-        CTLog(@"Error %li calling sqlite3_step exec_update_query %@ last statments:%@",
-              rc, self.lastError, self.sQueryList);
-        //sqlite3_trace(self.dbHandle, myTraceFunc, NULL);
+        CTLog(@"Error %li calling sqlite3_step exec_update_query %@",
+              rc, self.lastError);
+        sqlite3_trace(self.dbHandle, myTraceFunc, NULL);
         if (error) {
             *error = self.lastError;
         }
