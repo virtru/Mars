@@ -36,8 +36,8 @@
         NSDictionary *fileAttrs = [fm attributesOfItemAtPath:logPath error:nil];
         if (fileAttrs) {
             unsigned long long int fileSize = [fileAttrs fileSize];
-            // If the file is greater than 10mb then clear the file
-            if (fileSize > 1024*1024*10) {
+            // If the file is greater than 5mb then clear the file
+            if (fileSize > 1024*1024*5) {
                 [self truncate];
             }
         }

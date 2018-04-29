@@ -23,7 +23,6 @@
 @interface MConnection : NSObject
 @property (nonatomic, assign, readonly) sqlite3 *dbHandle;
 @property (nonatomic, assign, readonly) int64_t lastInsertRowId;
-@property (nonatomic, strong) NSMutableArray* sQueryList;
 
 - (id)init;
 - (id)initWithPath:(NSString *)path;
