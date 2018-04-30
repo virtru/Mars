@@ -157,7 +157,7 @@ void myTraceFunc(void *uData, const char *statement)
         } else {
             CTLog(@"Error %li calling sqlite3_step exec_query %@",
                   r, self.lastError);
-            sqlite3_trace(self.dbHandle, myTraceFunc, NULL);
+            //sqlite3_trace(self.dbHandle, myTraceFunc, NULL);
             if (error) {
                 *error = self.lastError;
             }
@@ -190,7 +190,7 @@ void myTraceFunc(void *uData, const char *statement)
     } else {
         CTLog(@"Error %li calling sqlite3_step exec_update_query %@",
               rc, self.lastError);
-        sqlite3_trace(self.dbHandle, myTraceFunc, NULL);
+        //sqlite3_trace(self.dbHandle, myTraceFunc, NULL);
         if (error) {
             *error = self.lastError;
         }

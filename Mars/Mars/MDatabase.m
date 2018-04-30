@@ -149,8 +149,9 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
 	}
 }
 
-// FIXME: Executing a raw query on reader connection
-// causing - Error Domain=MDatabase Code=6 "database table is locked"'
+// FIXME: Executing a query on reader connection
+// causing on background fetch. - Error Domain=MDatabase Code=6
+// "database table is locked"'.
 // As a temporary workaround executing a raw query on writer connection
 // which is on serial queue.
 // IOS-1452 Research - SQLite WAL mode causing database
@@ -175,21 +176,27 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
     return op;
 }
 
+// FIXME: Executing a query on reader connection
+// causing on background fetch. - Error Domain=MDatabase Code=6
+// "database table is locked"'.
+// As a temporary workaround executing a raw query on writer connection
+// which is on serial queue.
+// IOS-1452 Research - SQLite WAL mode causing database
+// table lock on background fetch.
 - (NSOperation *)select:(MQuery *)query completionBlock:(void (^)(NSError *err, id result))completionBlock {
     __weak MDatabase *weakSelf = self;
     NSBlockOperation *op = [NSBlockOperation blockOperationWithBlock:^{
         MDatabase *strongSelf = weakSelf;
-        MConnection *reader = [strongSelf reader];
+        MConnection *writer = strongSelf.writer;
         NSError *error = nil;
-        NSArray *val = [reader executeQuery:query error:&error];
+        NSArray *val = [writer executeQuery:query error:&error];
         if (val) {
             if (completionBlock) completionBlock(nil, val);
         } else {
             if (completionBlock) completionBlock(error, nil);
         }
-        [self putBackReader:reader];
     }];
-    [self.readQueue addOperation:op];
+    [self.writeQueue addOperation:op];
     return op;
 }
 
