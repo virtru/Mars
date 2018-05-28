@@ -11,6 +11,7 @@
 #import "MQuery.h"
 #import "MInsertQuery.h"
 #import "MDatabase+Private.h"
+#import "CTLogger.h"
 
 #import <sqlite3.h>
 
@@ -102,6 +103,7 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
 }
 
 - (id)query:(MQuery *)query error:(NSError **)err {
+    NSDate *startTime = [NSDate date];
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     __block NSError *error = nil;
     __block id result = nil;
@@ -120,6 +122,7 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
         }];
     }
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    CTLog(@"Query:%@ - Time: %f", query, -[startTime timeIntervalSinceNow]);
     if (err) *err = error;
     if (error) {
         return nil;
@@ -130,6 +133,7 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
 
 - (id)rawQuery:(NSString *)query error:(NSError *__autoreleasing *)error
 {
+    NSDate *startTime = [NSDate date];
 	dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
 	__block NSError *err = nil;
 	__block id result = nil;
@@ -141,6 +145,8 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
 		dispatch_semaphore_signal(semaphore);
 	}];
 	dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+	
+	CTLog(@"RawQuery:%@ - Time: %f", query, -[startTime timeIntervalSinceNow]);
 	if (error) *error = err;
 	if (err) {
 		return nil;
