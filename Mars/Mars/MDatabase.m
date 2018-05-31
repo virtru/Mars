@@ -164,6 +164,7 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
 // table lock on background fetch.
 - (NSOperation *)rawQuery:(NSString *)query completionBlock:(void (^)(NSError *err, id result))completionBlock
 {
+    NSDate *startTime = [NSDate date];
     __weak MDatabase *weakSelf = self;
     NSBlockOperation *op = [NSBlockOperation blockOperationWithBlock:^{
         MDatabase *strongSelf = weakSelf;
@@ -175,8 +176,8 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
             
         } else {
             if (completionBlock) completionBlock(error, nil);
-            
         }
+        CTLog(@"RawQuery with completionBlock:%@ - Time: %f", query, -[startTime timeIntervalSinceNow]);
     }];
     [self.writeQueue addOperation:op];
     return op;
@@ -190,6 +191,7 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
 // IOS-1452 Research - SQLite WAL mode causing database
 // table lock on background fetch.
 - (NSOperation *)select:(MQuery *)query completionBlock:(void (^)(NSError *err, id result))completionBlock {
+    NSDate *startTime = [NSDate date];
     __weak MDatabase *weakSelf = self;
     NSBlockOperation *op = [NSBlockOperation blockOperationWithBlock:^{
         MDatabase *strongSelf = weakSelf;
@@ -201,12 +203,14 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
         } else {
             if (completionBlock) completionBlock(error, nil);
         }
+        CTLog(@"Select with completionBlock:%@ - Time: %f", query, -[startTime timeIntervalSinceNow]);
     }];
     [self.writeQueue addOperation:op];
     return op;
 }
 
 - (NSOperation *)change:(MQuery *)query completionBlock:(void (^)(NSError *err, id result))completionBlock {
+    NSDate *startTime = [NSDate date];
     __weak MDatabase *weakSelf = self;
     NSBlockOperation *op = [NSBlockOperation blockOperationWithBlock:^{
         MDatabase *strongSelf = weakSelf;
@@ -221,6 +225,7 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
         } else {
             if (completionBlock) completionBlock(error, nil);
         }
+        CTLog(@"Change with completionBlock:%@ - Time: %f", query, -[startTime timeIntervalSinceNow]);
     }];
     [self.writeQueue addOperation:op];
     return op;
