@@ -103,7 +103,10 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
 }
 
 - (id)query:(MQuery *)query error:(NSError **)err {
+    
+#if LOG_QUERY_TIME
     NSDate *startTime = [NSDate date];
+#endif
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
     __block NSError *error = nil;
     __block id result = nil;
@@ -122,7 +125,14 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
         }];
     }
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-    CTLog(@"Query:%@ - Time: %f", query, -[startTime timeIntervalSinceNow]);
+    
+#if LOG_QUERY_TIME
+    int64_t totalQueryTimeInMs = (int64_t)(-[startTime timeIntervalSinceNow] * 1000);
+    if (totalQueryTimeInMs > 100) {
+        CTLog(@"Query:%@ - Time:%d ms", query, totalQueryTimeInMs);
+    }
+#endif
+    
     if (err) *err = error;
     if (error) {
         return nil;
@@ -133,7 +143,10 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
 
 - (id)rawQuery:(NSString *)query error:(NSError *__autoreleasing *)error
 {
+#if LOG_QUERY_TIME
     NSDate *startTime = [NSDate date];
+#endif
+    
 	dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
 	__block NSError *err = nil;
 	__block id result = nil;
@@ -145,8 +158,14 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
 		dispatch_semaphore_signal(semaphore);
 	}];
 	dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-	
-	CTLog(@"RawQuery:%@ - Time: %f", query, -[startTime timeIntervalSinceNow]);
+    
+#if LOG_QUERY_TIME
+    int64_t totalQueryTimeInMs = (int64_t)(-[startTime timeIntervalSinceNow] * 1000);
+    if (totalQueryTimeInMs > 100) {
+        CTLog(@"RawQuery:%@ - Time:%d ms", query, totalQueryTimeInMs);
+    }
+#endif
+    
 	if (error) *error = err;
 	if (err) {
 		return nil;
@@ -164,9 +183,13 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
 // table lock on background fetch.
 - (NSOperation *)rawQuery:(NSString *)query completionBlock:(void (^)(NSError *err, id result))completionBlock
 {
-    NSDate *startTime = [NSDate date];
     __weak MDatabase *weakSelf = self;
     NSBlockOperation *op = [NSBlockOperation blockOperationWithBlock:^{
+
+#if LOG_QUERY_TIME
+        NSDate *startTime = [NSDate date];
+#endif
+        
         MDatabase *strongSelf = weakSelf;
         MConnection *writer = strongSelf.writer;
         NSError *error = nil;
@@ -177,7 +200,15 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
         } else {
             if (completionBlock) completionBlock(error, nil);
         }
-        CTLog(@"RawQuery with completionBlock:%@ - Time: %f", query, -[startTime timeIntervalSinceNow]);
+        
+#if LOG_QUERY_TIME
+        int64_t totalQueryTimeInMs = (int64_t)(-[startTime timeIntervalSinceNow] * 1000);
+        if (totalQueryTimeInMs > 100) {
+            CTLog(@"RawQuery-exc with completionBlock:%@ - Time:%d ms",
+                  query, totalQueryTimeInMs);
+        }
+#endif
+        
     }];
     [self.writeQueue addOperation:op];
     return op;
@@ -191,9 +222,13 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
 // IOS-1452 Research - SQLite WAL mode causing database
 // table lock on background fetch.
 - (NSOperation *)select:(MQuery *)query completionBlock:(void (^)(NSError *err, id result))completionBlock {
-    NSDate *startTime = [NSDate date];
     __weak MDatabase *weakSelf = self;
     NSBlockOperation *op = [NSBlockOperation blockOperationWithBlock:^{
+        
+#if LOG_QUERY_TIME
+        NSDate *startTime = [NSDate date];
+#endif
+        
         MDatabase *strongSelf = weakSelf;
         MConnection *writer = strongSelf.writer;
         NSError *error = nil;
@@ -203,16 +238,28 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
         } else {
             if (completionBlock) completionBlock(error, nil);
         }
-        CTLog(@"Select with completionBlock:%@ - Time: %f", query, -[startTime timeIntervalSinceNow]);
+        
+#if LOG_QUERY_TIME
+        int64_t totalQueryTimeInMs = (int64_t)(-[startTime timeIntervalSinceNow] * 1000);
+        if (totalQueryTimeInMs > 100) {
+            CTLog(@"Select-exc with completionBlock:%@ - Time:%d ms",
+                  query, totalQueryTimeInMs);
+        }
+#endif
+        
     }];
     [self.writeQueue addOperation:op];
     return op;
 }
 
 - (NSOperation *)change:(MQuery *)query completionBlock:(void (^)(NSError *err, id result))completionBlock {
-    NSDate *startTime = [NSDate date];
     __weak MDatabase *weakSelf = self;
     NSBlockOperation *op = [NSBlockOperation blockOperationWithBlock:^{
+
+#if LOG_QUERY_TIME
+        NSDate *startTime = [NSDate date];
+#endif
+        
         MDatabase *strongSelf = weakSelf;
         NSError *error = nil;
         int64_t r = [strongSelf.writer executeUpdate:query error:&error];
@@ -225,7 +272,15 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
         } else {
             if (completionBlock) completionBlock(error, nil);
         }
-        CTLog(@"Change with completionBlock:%@ - Time: %f", query, -[startTime timeIntervalSinceNow]);
+        
+#if LOG_QUERY_TIME
+        int64_t totalQueryTimeInMs = (int64_t)(-[startTime timeIntervalSinceNow] * 1000);
+        if (totalQueryTimeInMs > 100) {
+            CTLog(@"Change-exc with completionBlock:%@ - Time:%d ms",
+                  query, totalQueryTimeInMs);
+        }
+#endif
+        
     }];
     [self.writeQueue addOperation:op];
     return op;

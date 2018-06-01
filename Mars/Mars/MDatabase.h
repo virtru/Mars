@@ -13,6 +13,11 @@
 #define MToNull(v)   (v == nil ? [NSNull null] : v)
 #define MFromNull(v) (v == [NSNull null] ? nil : v)
 
+#ifdef DEBUG
+#define LOG_QUERY_TIME 1
+#else
+#define LOG_QUERY_TIME 1
+#endif
 
 @class MQuery;
 @class MTransaction;
