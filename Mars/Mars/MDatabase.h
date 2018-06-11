@@ -16,7 +16,7 @@
 #ifdef DEBUG
 #define LOG_QUERY_TIME 1
 #else
-#define LOG_QUERY_TIME 1
+#define LOG_QUERY_TIME 0
 #endif
 
 @class MQuery;
