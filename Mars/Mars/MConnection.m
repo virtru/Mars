@@ -16,6 +16,27 @@ void myTraceFunc(void *uData, const char *statement)
     CTLog(@"TRACE: %s", statement);
 }
 
+static int DatabaseBusyHandler(void *connectionDB, int count) {
+    MConnection *self = (__bridge MConnection*)connectionDB;
+    
+    if (count == 0) {
+        self.startBusyRetryTime = [NSDate timeIntervalSinceReferenceDate];
+        return 1;
+    }
+    
+    NSTimeInterval delta = [NSDate timeIntervalSinceReferenceDate] - self.startBusyRetryTime;
+    if (delta < [self maxBusyRetryTimeInterval]) {
+        int requestedSleepInMillseconds = (int) arc4random_uniform(50) + 50;
+        int actualSleepInMilliseconds = sqlite3_sleep(requestedSleepInMillseconds);
+        if (actualSleepInMilliseconds != requestedSleepInMillseconds) {
+            CTLog(@"WARNING: Requested sleep of %i milliseconds, but SQLite returned %i. Maybe SQLite wasn't built with HAVE_USLEEP=1?", requestedSleepInMillseconds, actualSleepInMilliseconds);
+        }
+        return 1;
+    }
+    
+    return 0;
+}
+
 @implementation MConnection {
     sqlite3 *_dbHandle;
     NSString *_dbPath;
@@ -41,6 +62,9 @@ void myTraceFunc(void *uData, const char *statement)
         CTLog(@"ERROR OPENING DB: %d", err);
         return NO;
     }
+    
+    self.maxBusyRetryTimeInterval = 5;
+    sqlite3_busy_handler(_dbHandle, &DatabaseBusyHandler, (__bridge void *)(self));
     
     [self configureDatabaseSettings];
     

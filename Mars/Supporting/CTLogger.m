@@ -57,10 +57,11 @@
     va_list args;
     va_start(args, format);
     NSString *msg = [[NSString alloc] initWithFormat:format arguments:args];
-    NSString* str = ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) ? @"Background" : @"Foreground";
-    NSString *line = [NSString stringWithFormat:@"[%@] [%@] %@\n", str, [formatter stringFromDate:[NSDate date]], msg];
+
     va_end(args);
     dispatch_sync(queue, ^() {
+        NSString* str = ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) ? @"Background" : @"Foreground";
+        NSString *line = [NSString stringWithFormat:@"[%@] [%@] %@\n", str, [formatter stringFromDate:[NSDate date]], msg];
         [log writeData:[line dataUsingEncoding:NSUTF8StringEncoding]];
 #if defined(DEBUG)
         NSLog(@"%@", msg);

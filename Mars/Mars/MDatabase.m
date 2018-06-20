@@ -174,13 +174,6 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
 	}
 }
 
-// FIXME: Executing a query on reader connection
-// causing on background fetch. - Error Domain=MDatabase Code=6
-// "database table is locked"'.
-// As a temporary workaround executing a raw query on writer connection
-// which is on serial queue.
-// IOS-1452 Research - SQLite WAL mode causing database
-// table lock on background fetch.
 - (NSOperation *)rawQuery:(NSString *)query completionBlock:(void (^)(NSError *err, id result))completionBlock
 {
     __weak MDatabase *weakSelf = self;
@@ -191,9 +184,9 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
 #endif
         
         MDatabase *strongSelf = weakSelf;
-        MConnection *writer = strongSelf.writer;
+        MConnection *reader = [strongSelf reader];
         NSError *error = nil;
-        NSArray *val = [writer executeRawQuery:query error:&error];
+        NSArray *val = [reader executeRawQuery:query error:&error];
         if (val) {
             if (completionBlock) completionBlock(nil, val);
             
@@ -210,7 +203,7 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
 #endif
         
     }];
-    [self.writeQueue addOperation:op];
+    [self.readQueue addOperation:op];
     return op;
 }
 
