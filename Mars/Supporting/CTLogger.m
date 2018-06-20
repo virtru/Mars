@@ -4,6 +4,7 @@
 
 
 #import "CTLogger.h"
+#import <UIKit/UIApplication.h>
 
 @implementation CTLogger {
     dispatch_queue_t queue;
@@ -56,7 +57,8 @@
     va_list args;
     va_start(args, format);
     NSString *msg = [[NSString alloc] initWithFormat:format arguments:args];
-    NSString *line = [NSString stringWithFormat:@"[%@] %@\n", [formatter stringFromDate:[NSDate date]], msg];
+    NSString* str = ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) ? @"Background" : @"Foreground";
+    NSString *line = [NSString stringWithFormat:@"[%@] [%@] %@\n", str, [formatter stringFromDate:[NSDate date]], msg];
     va_end(args);
     dispatch_sync(queue, ^() {
         [log writeData:[line dataUsingEncoding:NSUTF8StringEncoding]];
