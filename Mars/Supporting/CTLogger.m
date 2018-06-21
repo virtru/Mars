@@ -60,8 +60,7 @@
 
     va_end(args);
     dispatch_sync(queue, ^() {
-        NSString* str = ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) ? @"Background" : @"Foreground";
-        NSString *line = [NSString stringWithFormat:@"[%@] [%@] %@\n", str, [formatter stringFromDate:[NSDate date]], msg];
+        NSString *line = [NSString stringWithFormat:@"[%@] %@\n",[formatter stringFromDate:[NSDate date]], msg];
         [log writeData:[line dataUsingEncoding:NSUTF8StringEncoding]];
 #if defined(DEBUG)
         NSLog(@"%@", msg);

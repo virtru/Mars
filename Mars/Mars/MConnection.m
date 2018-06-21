@@ -55,8 +55,12 @@ static int DatabaseBusyHandler(void *connectionDB, int count) {
 }
 
 - (BOOL)open {
+    
+    // SQLITE_OPEN_SHAREDCACHE - using this flag causing MDatabase
+    // Code=6 "database table is locked" - error so removed for better
+    // performance.
     int err = sqlite3_open_v2(_dbPath ? (char *)[_dbPath fileSystemRepresentation] : ":memory:", &_dbHandle,
-                              SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_SHAREDCACHE, NULL);
+                              SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
     
     if (err != SQLITE_OK) {
         CTLog(@"ERROR OPENING DB: %d", err);
