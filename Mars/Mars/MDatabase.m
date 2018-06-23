@@ -15,6 +15,9 @@
 
 #import <sqlite3.h>
 
+static const NSInteger kMaxQueryTimeInMs = 100;
+static const NSInteger kQueryTextLength = 80;
+
 @interface MDatabase ()
 @property (nonatomic, strong, readonly) NSOperationQueue *readQueue;
 @property (nonatomic, strong, readonly) MConnection *writer;
@@ -161,8 +164,9 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
     
 #if LOG_QUERY_TIME
     int64_t totalQueryTimeInMs = (int64_t)(-[startTime timeIntervalSinceNow] * 1000);
-    if (totalQueryTimeInMs > 100) {
-        CTLog(@"RawQuery:%@ - Time:%d ms", query, totalQueryTimeInMs);
+    if (totalQueryTimeInMs > kMaxQueryTimeInMs) {
+        NSInteger length = query.length < kQueryTextLength ? query.length : kQueryTextLength;
+        CTLog(@"RawQuery:%@ - Time:%d ms", [query substringToIndex:length], totalQueryTimeInMs);
     }
 #endif
     
@@ -196,9 +200,10 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
         
 #if LOG_QUERY_TIME
         int64_t totalQueryTimeInMs = (int64_t)(-[startTime timeIntervalSinceNow] * 1000);
-        if (totalQueryTimeInMs > 100) {
+        if (totalQueryTimeInMs > kMaxQueryTimeInMs) {
+            NSInteger length = query.length < kQueryTextLength ? query.length : kQueryTextLength;
             CTLog(@"RawQuery-exc with completionBlock:%@ - Time:%d ms",
-                  query, totalQueryTimeInMs);
+                  [query substringToIndex:length], totalQueryTimeInMs);
         }
 #endif
         
@@ -227,9 +232,11 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
         
 #if LOG_QUERY_TIME
         int64_t totalQueryTimeInMs = (int64_t)(-[startTime timeIntervalSinceNow] * 1000);
-        if (totalQueryTimeInMs > 100) {
+        if (totalQueryTimeInMs > kMaxQueryTimeInMs) {
+            NSString* queryDesc = query.description;
+            NSInteger length = queryDesc.length < kQueryTextLength ? queryDesc.length : kQueryTextLength;
             CTLog(@"Select-exc with completionBlock:%@ - Time:%d ms",
-                  query, totalQueryTimeInMs);
+                   [queryDesc substringToIndex:length], totalQueryTimeInMs);
         }
 #endif
         
@@ -261,9 +268,11 @@ withCompletionOnMainThread:(BOOL)completionOnMainThread
         
 #if LOG_QUERY_TIME
         int64_t totalQueryTimeInMs = (int64_t)(-[startTime timeIntervalSinceNow] * 1000);
-        if (totalQueryTimeInMs > 100) {
+        if (totalQueryTimeInMs > kMaxQueryTimeInMs) {
+            NSString* queryDesc = query.description;
+            NSInteger length = queryDesc.length < kQueryTextLength ? queryDesc.length : kQueryTextLength;
             CTLog(@"Change-exc with completionBlock:%@ - Time:%d ms",
-                  query, totalQueryTimeInMs);
+                  [queryDesc substringToIndex:length], totalQueryTimeInMs);
         }
 #endif
         
