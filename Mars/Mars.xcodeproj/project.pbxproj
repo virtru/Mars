@@ -78,6 +78,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		99608C9D21B97DB500D9C6CF /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C07ADB33DDA93701C9CD6E57 /* MDatabase+AsyncAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MDatabase+AsyncAdditions.m"; sourceTree = "<group>"; };
 		C07ADDE8399B0B50FAE585D1 /* MDatabase+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MDatabase+Private.h"; sourceTree = "<group>"; };
 		C07ADE8ABA30C0CC9A8B33D7 /* MDatabase+AsyncAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MDatabase+AsyncAdditions.h"; sourceTree = "<group>"; };
@@ -304,6 +305,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				fr,
 			);
 			mainGroup = F89887FD16DAF59400B5ED12;
 			productRefGroup = F898880716DAF59400B5ED12 /* Products */;
@@ -369,6 +371,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				F898882416DAF59500B5ED12 /* en */,
+				99608C9D21B97DB500D9C6CF /* fr */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
