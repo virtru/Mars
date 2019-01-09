@@ -28,6 +28,14 @@
                 completionBlock(err, nil);
                 return;
             }
+            
+            if (!result) {
+                NSError *error = [NSError errorWithDomain:@"MDatabase"
+                                                     code:-1
+                                                 userInfo:@{NSLocalizedDescriptionKey: @"query result is nil"}];
+                completionBlock(error, nil);
+                return;
+            }
 
             NSUInteger pos = [queries indexOfObject:query];
             results[pos] = result;
