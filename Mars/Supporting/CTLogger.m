@@ -60,8 +60,8 @@
 
     va_end(args);
     dispatch_sync(queue, ^() {
-        NSString *line = [NSString stringWithFormat:@"[%@] %@\n",[formatter stringFromDate:[NSDate date]], msg];
-        [log writeData:[line dataUsingEncoding:NSUTF8StringEncoding]];
+        NSString *line = [NSString stringWithFormat:@"[%@] %@\n",[self->formatter stringFromDate:[NSDate date]], msg];
+        [self->log writeData:[line dataUsingEncoding:NSUTF8StringEncoding]];
 #if defined(DEBUG)
         NSLog(@"%@", msg);
 #endif

@@ -198,7 +198,9 @@ static int DatabaseBusyHandler(void *connectionDB, int count) {
 {
     sqlite3_stmt *stmt = [self createStatement:rawQuery bindings:@[] error:error];
     if (!stmt) {
-        *error = self.lastError;
+        if(error != nil){
+            *error = self.lastError;
+        }
         CTLog(@"Error creating statement for raw query %@", self.lastError);
         return nil;
     }
